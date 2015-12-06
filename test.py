@@ -22,7 +22,8 @@ For the actual track features, if you split them by comma, you get the following
 
 In order to avoid double algorithms, the conversion process to feature should take place within the for loop.
 
-For the actual scripting, I may make a class or function that does the actual work, while making the main just the thing that interfaces with the class...
+For the actual scripting, I may make a class or function that does the actual work, while making the main just the thing
+ that interfaces with the class...
 
 >>> a[0]
 'OziExplorer Track Point File Version 2.1\n'
@@ -47,27 +48,27 @@ For the actual scripting, I may make a class or function that does the actual wo
 '''
 
 
-#Set Input Parameters:
+# Set Input Parameters:
 endProgram = False
 endMessage = ["","I am unable to deal with that coordinate system", "this file doesn't look right"]
-#Input track file (single at first)
+# Input track file (single at first)
 inTrack = ""
 outFile = ""
 outPath = ""
 
-#Input Time Zone
+# Input Time Zone
 timeZone = ""
-#Input Daylight Savings
+# Input Daylight Savings
 isDaylightSavings = True
 
 
-#Get data
+# Get data
 record = []
 with open(inTrack) as inFile:
     for line in inFile:
         record.append(line)
 
-#Carry out file verification
+# Carry out file verification
 '''
 >>> a[0]
 'OziExplorer Track Point File Version 2.1\n'
@@ -98,13 +99,13 @@ if record[2] != 'Altitude is in Feet\n':
 
 
 
-#If not file verification: Kill the program
+# If not file verification: Kill the program
 if not endProgram:
 
-    #Create Feature Class
+    # Create Feature Class
     arcpy.CreateFeatureclass_management(dir, outFile,"POINT", spatial_reference=sr)
 
-    #Add columns to feature class. Lat, Long, Altitude, GPS time, Date, Local Time. everything but time and date are float.
+    # Add columns to feature class. Lat, Long, Altitude, GPS time, Date, Local Time. everything but time and date are float.
 
     count = 6
     '''This is what a single line looks like when it's split:
@@ -120,40 +121,31 @@ if not endProgram:
         date = row[5]
         time = row[6][:-1]
 
-        #verify the integrity of each of the coordinates. Lat needs to have only two characters before the decimal.
+        # verify the integrity of each of the coordinates. Lat needs to have only two characters before the decimal.
 
 
 
         cursor = arcpy.da.InsertCursor(outPath+outFile,
                                        ("SHAPE@XY", "Lat", "Long", "Altitude", "GPSTime", "Date", "Time"))
 
-        row = cursor.newRow()
-        row.setvalue("SHAPE@XY",xy)
-        row.setvalue("Lat",lat)
-        row.setvalue("Long",long)
-        row.setvalue("Altitude",altitude)
-        row.setvalue("GPSTime",gpsTime)
-        row.setvalue("Date",date)
-        row.setvalue("Time",time)
-        #start the while loop by verifying EOL - Terminate the while loop if this is the case.
-        #Verify Lat has two characters before the decimal - Terminate the while loop if this is the case by setting the counter to an unrealistic number.
-        #verify that the long has a negative sign. - Terminate the while loop if this is the case.
+        cursor.insertRow((xy,lat,long,altitude,gpsTime,date,time))
 
-        #in this while loop, create a new feature with geometry that matches the geometry on the bit. Add the other details in.
-        #Convert the time as well.
+        # The proper usage of insertCurrsor is: cursor.insertRow((xy,"words",date,time))
+        # in this while loop, create a new feature with geometry that matches the geometry on the bit. Add the other details in.
+        # Convert the time as well.
 
 
-        #END WHILE LOOP
+        # END WHILE LOOP
 
 
-        #check topographic integrity of feature class
+        # check topographic integrity of feature class
 
 
 
-        #convert feature class to UTM for accuracy. This class is the final name of the shapefile and should bear similarity to the track file.
+        # convert feature class to UTM for accuracy. This class is the final name of the shapefile and should bear similarity to the track file.
 
 
-        #we're done here.
+        # we're done here.
 
         #
 
